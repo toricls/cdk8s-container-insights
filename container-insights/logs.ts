@@ -1,7 +1,7 @@
 import { Construct } from 'constructs';
 import { BaseParams } from './base-params';
 import { ServiceAccount, ClusterRole, ClusterRoleBinding, ConfigMap, DaemonSet } from '../imports/k8s';
-import { fluentConf, containersConf, systemdConf, hostConf, confHash } from '../fluentd';
+import { fluentConf, containersConf, systemdConf, hostConf, confHash } from '../config/fluentd';
 
 export interface LogsOptions extends BaseParams {
     readonly fluentdImageName: string;
@@ -59,10 +59,10 @@ export default class extends Construct {
             data: config
         });
         let fluentdConfig: { [key: string]: string } = {};
-        config['fluent.conf'] = fluentConf;
-        config['containers.conf'] = containersConf;
-        config['systemd.conf'] = systemdConf;
-        config['host.conf'] = hostConf;
+        fluentdConfig['fluent.conf'] = fluentConf;
+        fluentdConfig['containers.conf'] = containersConf;
+        fluentdConfig['systemd.conf'] = systemdConf;
+        fluentdConfig['host.conf'] = hostConf;
         const cm = new ConfigMap(scope, name + '-fluentd-cm', {
             metadata: {
                 name: 'fluentd-config',

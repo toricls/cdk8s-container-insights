@@ -1,6 +1,7 @@
 import { Construct } from 'constructs';
 import { BaseParams } from './base-params';
 import { ServiceAccount, ClusterRole, ClusterRoleBinding, ConfigMap, DaemonSet } from '../imports/k8s';
+import * as cwagentConfig from '../config/cwagent/config.json';
 
 export interface MetricsOptions extends BaseParams {
     /**
@@ -91,20 +92,12 @@ export default class extends Construct {
         });
 
         // Creates configmap for cwagent
+        cwagentConfig.agent.region = options.region;
+        cwagentConfig.logs.metrics_collected.kubernetes.cluster_name = options.clusterName;
+        cwagentConfig.logs.metrics_collected.kubernetes.metrics_collection_interval = metricsCollectionInterval;
+        cwagentConfig.logs.force_flush_interval = forceFlushInterval;
         let config : { [key: string]: string } = {};
-        config['cwagentconfig.json'] = [
-            '{',
-                '"logs": {',
-                    '"metrics_collected": {',
-                        '"kubernetes": {',
-                            '"cluster_name": "' + options.clusterName + '",',
-                            '"metrics_collection_interval":' + metricsCollectionInterval + ',',
-                        '}',
-                  '}',
-                  '"force_flush_interval":' + forceFlushInterval + ',',
-                '}',
-            '}'
-        ].join('\n')
+        config['cwagentconfig.json'] = JSON.stringify(cwagentConfig);
         const cm = new ConfigMap(scope, name + '-cm', {
             metadata: {
                 name: 'cwagent-cm',
