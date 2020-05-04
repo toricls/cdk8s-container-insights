@@ -58,7 +58,7 @@ class ContainerInsights extends Chart {
 
 const k8sClusterName = process.env.K8S_CLUSTER_NAME;
 if (!k8sClusterName) { throw new Error('K8S_CLUSTER_NAME environment variable is required'); }
-const region = process.env.AWS_DEFAULT_REGION || 'us-west-2';
+const region = process.env.AWS_REGION || 'us-west-2';
 const ciNamespace = process.env.CI_NAMESPACE || 'amazon-cloudwatch';
 
 const app = new App();
